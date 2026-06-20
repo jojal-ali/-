@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Patient Record</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    background:#fff;
+    margin:0;
+    color:#222;
+  }
+
+  /* ===== TOP HEADER ===== */
+  .top-header{
+    border-bottom:2px solid #d9e6ea;
+    position:relative;
+  }
+  .top-header-inner{
+    display:flex;
+    align-items:flex-start;
+    padding:14px 24px 10px 24px;
+    gap:26px;
+    background:#eef6f7;
+  }
+  .avatar{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#0d8aa3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:22px;
+    flex-shrink:0;
+  }
+  .pinfo{width:280px;flex-shrink:0;}
+  .pinfo .name{color:#1485a0;font-size:17px;font-weight:700;margin-bottom:2px;}
+  .pinfo .meta{font-size:13px;color:#222;line-height:1.55;}
+  .pinfo .meta b{font-weight:700;}
+
+  .colblock{min-width:160px;flex-shrink:0;}
+  .colblock .label{font-size:13px;color:#444;font-weight:600;margin-bottom:6px;}
+  .token-pill{
+    display:inline-block;
+    border:1px solid #e08b1d;
+    color:#e08b1d;
+    font-weight:700;
+    font-size:13px;
+    padding:1px 12px;
+    border-radius:14px;
+  }
+  .colblock .value{font-size:14px;font-weight:700;color:#1d1d1d;}
+  .colblock .value.teal{color:#1485a0;}
+  .colblock .value.orange{color:#e08b1d;}
+
+  .row2{
+    display:flex;
+    align-items:center;
+    padding:10px 24px 14px 24px;
+    gap:34px;
+    background:#fff;
+    flex-wrap:wrap;
+  }
+  .vital{display:flex;align-items:center;gap:8px;font-size:13px;color:#333;}
+  .vital .icon{
+    width:24px;height:24px;border-radius:5px;
+    background:#eaf3f6;display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:#0d8aa3;
+  }
+  .vital .vlabel{font-weight:700;color:#222;font-size:13px;}
+  .vital .vsub{font-size:12.5px;color:#555;}
+
+  /* ===== ALERT BADGE ===== */
+  .report-alert{
+    position:absolute;
+    top:-12px;
+    right:14px;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#e9362f;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 2px 6px rgba(233,54,47,0.5);
+    cursor:pointer;
+    animation:pulse 1.8s infinite;
+    z-index:10;
+  }
+  .report-alert svg{width:17px;height:17px;fill:#fff;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(233,54,47,0.55);}
+    70%{box-shadow:0 0 0 8px rgba(233,54,47,0);}
+    100%{box-shadow:0 0 0 0 rgba(233,54,47,0);}
+  }
+  .report-alert .tooltip{
+    position:absolute;
+    top:38px;
+    right:0;
+    background:#1d1d1d;
+    color:#fff;
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:6px;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s;
+  }
+  .report-alert:hover .tooltip{opacity:1;}
+
+  /* ===== BODY LAYOUT ===== */
+  .body-wrap{display:flex;}
+  .sidebar{
+    width:280px;
+    flex-shrink:0;
+    border-right:1px solid #e3e8ec;
+    padding:14px;
+  }
+  .search-box{
+    display:flex;align-items:center;gap:8px;
+    background:#eaf3f6;border-radius:6px;
+    padding:9px 12px;margin-bottom:14px;color:#888;font-size:14px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 12px;border-radius:6px;
+    font-size:14px;color:#333;margin-bottom:4px;cursor:pointer;
+  }
+  .nav-item .ic{width:18px;text-align:center;color:#0d8aa3;}
+  .nav-item.active{background:#eaf3f6;color:#0d8aa3;font-weight:600;}
+
+  .main-content{flex:1;padding:14px 24px;}
+  .panel-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .panel-title{color:#1485a0;font-size:18px;font-weight:700;}
+  .visit-select{
+    flex:1;max-width:420px;margin:0 18px;
+    border:1px solid #d9e0e4;border-radius:6px;
+    padding:8px 14px;font-size:13px;color:#444;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .legend{display:flex;gap:18px;font-size:13px;color:#333;align-items:center;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;}
+
+  .section{
+    border:1px solid #e3e8ec;border-radius:6px;margin-bottom:14px;overflow:hidden;
+  }
+  .section-head{
+    background:#dfeef1;
+    color:#0a4f5e;
+    font-weight:700;
+    font-size:13.5px;
+    padding:9px 16px;
+    display:flex;justify-content:space-between;
+    clip-path: polygon(0 0, 100% 0, 97% 100%, 0% 100%);
+  }
+  .section-body{padding:14px 18px;font-size:13.5px;line-height:1.7;color:#222;}
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <div class="report-alert">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+    <div class="tooltip">لا يوجد تقرير طبي محدث لهذا اليوم</div>
+  </div>
+
+  <div class="top-header-inner">
+    <div class="avatar">👤</div>
+    <div class="pinfo">
+      <div class="name">Azzam Rateb Odeh</div>
+      <div class="meta">
+        Male | 8 Month(s) &nbsp;<b>ID No.</b> : 2617284456<br>
+        <b>DOB</b> : 📅 04-Oct-2025<br>
+        JORDAN | Mobile :0500230957<br>
+        RegCode : ALHH.0040058330
+      </div>
+    </div>
+
+    <div class="colblock">
+      <div class="label">Token No.</div>
+      <div class="token-pill">S5-08</div>
+    </div>
+
+    <div class="colblock">
+      <div class="label">Doctor Name</div>
+      <div class="value teal">8932-Dr FARAJALLA SALEM<br>IBRAHIM BARQAWI</div>
+    </div>
+
+    <div class="colblock">
+      <div class="label">Patient Type</div>
+      <div class="value">Insured</div>
+    </div>
+
+    <div class="colblock">
+      <div class="label">Insurance Name</div>
+      <div class="value">ARABIAN CONTRACTING SERVICES<br>CO // TAWUNIYA</div>
+    </div>
+
+    <div class="colblock">
+      <div class="label">PainScore</div>
+      <div class="value orange">No Hurt - Score 0</div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="vital"><div class="icon">🩸</div><div><div class="vlabel">BP</div><div class="vsub">. / .<br>20-Jun-2026 17:57</div></div></div>
+    <div class="vital"><div class="icon">🌡️</div><div><div class="vlabel">Temp</div><div class="vsub">37 C</div></div></div>
+    <div class="vital"><div class="icon">⚠️</div><div><div class="vlabel">Allergy</div><div class="vsub">NKA</div></div></div>
+    <div class="vital"><div class="icon">📏</div><div><div class="vlabel">Height</div><div class="vsub">75.00 Cm(s)</div></div></div>
+    <div class="vital"><div class="icon">⚖️</div><div><div class="vlabel">Weight</div><div class="vsub">9.20 Kg(s)</div></div></div>
+    <div class="vital"><div class="icon">🩹</div><div><div class="vlabel">Blood Group</div><div class="vsub"></div></div></div>
+    <div class="vital"><div class="icon">🛏️</div><div><div class="vlabel">OP Visit Date</div><div class="vsub">20-Jun-2026 17:53</div></div></div>
+  </div>
+</div>
+
+<div class="body-wrap">
+  <div class="sidebar">
+    <div class="search-box">🔍 Search</div>
+    <div class="nav-item active"><span class="ic">📋</span> Chief Complaints</div>
+    <div class="nav-item"><span class="ic">📄</span> CaseRecord</div>
+    <div class="nav-item"><span class="ic">❤️</span> Vitals</div>
+    <div class="nav-item"><span class="ic">🧍</span> Diagnosis</div>
+    <div class="nav-item"><span class="ic">💊</span> Medications</div>
+    <div class="nav-item"><span class="ic">🧪</span> Investigation</div>
+    <div class="nav-item"><span class="ic">📑</span> Procedures</div>
+    <div class="nav-item"><span class="ic">📝</span> Assessments</div>
+    <div class="nav-item"><span class="ic">🩸</span> Blood Request</div>
+    <div class="nav-item"><span class="ic">🛏️</span> BradenScale</div>
+    <div class="nav-item"><span class="ic">📋</span> Care Plan</div>
+  </div>
+
+  <div class="main-content">
+    <div class="panel-header">
+      <div class="panel-title">Chief Complaints</div>
+      <div class="visit-select">20-Jun-2026 17:53:54 - FARAJALLA SALEM IBRAI <span>🔍</span></div>
+      <div class="legend">
+        <span><span class="dot" style="background:#e9362f;"></span>ED</span>
+        <span><span class="dot" style="background:#2f6fe9;"></span>OP</span>
+        <span><span class="dot" style="background:#2fb950;"></span>IP</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Chief Complaints</span><span>OP-8932-FARAJALLA SALEM IBRAHIM BARQAWI - General Pediatrics</span></div>
+      <div class="section-body">HISTORY OF GIT UPSET IN THE FORM OF FEEDING INTOLERANCE CONSTIPATION WITH ABDOMINAL DISTENSION .. RUNNY NOSE , NO COUGH</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Subjective / History of Present illness</span><span>OP-8932-FARAJALLA SALEM IBRAHIM BARQAWI - General Pediatrics</span></div>
+      <div class="section-body">BABY HAS MALABSORPTION DUE TO INTOLERANCE CONSTIPATION G EXCESSIVE FLATULANCE SUGGESTING MILK INTOLATRANCE. FOR MILK REFILL</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Physical Examination</span><span>OP-8932-FARAJALLA SALEM IBRAHIM BARQAWI - General Pediatrics</span></div>
+      <div class="section-body">
+        TEMP: AFEBRILE<br>
+        CHEST: CLEAR<br>
+        HEART: NO MURMUR<br>
+        ENT: NOT CONGESTED<br>
+        LYMPH NODES: NOT ENLARGED<br>
+        ABDOMEN: DISTENDED
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span>Assessment and Plan</span><span>OP-8932-FARAJALLA SALEM IBRAHIM BARQAWI - General Pediatrics</span></div>
+      <div class="section-body">MALABSORPTION NEED FORMULA MILK</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
